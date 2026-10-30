@@ -1,0 +1,21 @@
+# Python virtual environments
+.venv*/
+venv/
+env/
+
+# Certificates and keys
+mycert/
+*.crt
+*.key
+*.pem
+
+# macOS
+.DS_Store
+~$*
+
+# Temp files
+*.tmp
+*.dtmp
+
+# Recovery codes
+Revoverycodes/
