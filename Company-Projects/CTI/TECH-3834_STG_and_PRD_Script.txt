@@ -1,0 +1,148 @@
+
+
+
+===========================================================================================================================
+-- SECTION 1 — STAGING (clientId 2021) — RUN FIRST
+===========================================================================================================================
+
+-- Step 1: Confirm baseline (also the value to roll back to)
+SELECT propertyId, clientId, code, entityType, dataType, label, description
+FROM Properties
+WHERE code LIKE '%minimum_investment%'
+  AND clientId = 2021;
+
+  propertyId|clientId|code              |entityType|dataType|label                     |description                                  |
+----------+--------+------------------+----------+--------+--------------------------+---------------------------------------------+
+     16547|    2021|minimum_investment|CLSS      |DCML    |Minimum Initial Investment|Minimum initial investment of the share class|
+
+-- Expect: propertyId 16547, dataType = DCML
+
+============================================================================================================================
+-- Step 2: Apply the change
+UPDATE Properties
+SET dataType = 'STRG'
+WHERE code LIKE '%minimum_investment%'
+  AND clientId = 2021
+  AND dataType = 'DCML';
+
+-- Expect "Updated Rows: 1"
+=============================================================================================================================
+
+-- Step 3: Confirm the change
+SELECT propertyId, clientId, code, entityType, dataType, label, description
+FROM Properties
+WHERE code LIKE '%minimum_investment%'
+  AND clientId = 2021;
+
+-- Expect: dataType = STRG
+===============================================================================================================================
+
+-- Step 4: Bust the cache
+SELECT clientId, lastModified, lastFlush
+FROM WarpdriveCache
+WHERE clientId = 2021;
+================================================================================================================================
+UPDATE WarpdriveCache
+SET lastModified = NOW()
+WHERE clientId = 2021;
+================================================================================================================================
+SELECT clientId, lastModified, lastFlush
+FROM WarpdriveCache
+WHERE clientId = 2021;
+
+
+-- Expect: lastModified shows current timestamp
+
+=================================================================================================================================
+
+-- STG ROLLBACK (if needed)
+=================================================================================================================================
+UPDATE Properties
+SET dataType = 'DCML'
+WHERE code LIKE '%minimum_investment%'
+  AND clientId = 2021
+  AND dataType = 'STRG';
+==================================================================================================================================
+SELECT propertyId, clientId, code, entityType, dataType, label, description
+FROM Properties
+WHERE code LIKE '%minimum_investment%'
+  AND clientId = 2021;
+===================================================================================================================================
+UPDATE WarpdriveCache
+SET lastModified = NOW()
+WHERE clientId = 2021;
+
+
+====================================================================================================================================
+-- SECTION 2 — PRODUCTION (clientId 2022) — DO NOT RUN UNTIL STG IS CONFIRMED
+-- AND SIGNED OFF
+====================================================================================================================================
+
+-- Step 1: Confirm baseline (also the value to roll back to)
+SELECT propertyId, clientId, code, entityType, dataType, label, description
+FROM Properties
+WHERE code LIKE '%minimum_investment%'
+  AND clientId = 2022;
+
+-- Expect: dataType = DCML
+
+  propertyId|clientId|code              |entityType|dataType|label                     |description                                  |
+----------+--------+------------------+----------+--------+--------------------------+---------------------------------------------+
+     16607|    2022|minimum_investment|CLSS      |DCML    |Minimum Initial Investment|Minimum initial investment of the share class|
+
+===================================================================================================================================
+
+-- Step 2: Apply the change
+UPDATE Properties
+SET dataType = 'STRG'
+WHERE code LIKE '%minimum_investment%'
+  AND clientId = 2022
+  AND dataType = 'DCML';
+
+-- Expect "Updated Rows: 1"
+====================================================================================================================================
+
+-- Step 3: Confirm the change
+SELECT propertyId, clientId, code, entityType, dataType, label, description
+FROM Properties
+WHERE code LIKE '%minimum_investment%'
+  AND clientId = 2022;
+
+-- Expect: dataType = STRG
+
+====================================================================================================================================
+-- Step 4: Bust the cache
+SELECT clientId, lastModified, lastFlush
+FROM WarpdriveCache
+WHERE clientId = 2022;
+====================================================================================================================================
+UPDATE WarpdriveCache
+SET lastModified = NOW()
+WHERE clientId = 2022;
+====================================================================================================================================
+SELECT clientId, lastModified, lastFlush
+FROM WarpdriveCache
+WHERE clientId = 2022;
+
+-- Expect: lastModified shows current timestamp
+
+====================================================================================================================================
+-- ----------------------------------------------------------------------------
+-- PRD ROLLBACK (if needed)
+-- ----------------------------------------------------------------------------
+UPDATE Properties
+SET dataType = 'DCML'
+WHERE code LIKE '%minimum_investment%'
+  AND clientId = 2022
+  AND dataType = 'STRG';
+====================================================================================================================================
+SELECT propertyId, clientId, code, entityType, dataType, label, description
+FROM Properties
+WHERE code LIKE '%minimum_investment%'
+  AND clientId = 2022;
+=====================================================================================================================================
+UPDATE WarpdriveCache
+SET lastModified = NOW()
+WHERE clientId = 2022;
+
+=====================================================================================================================================
